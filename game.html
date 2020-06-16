@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Traffic Control</title>
+		<link href="https://fonts.googleapis.com/css2?family='Bungee'&display=swap" rel="stylesheet">
+		<style type="text/css">
+		.meter {
+		height: 10px;  /* Can be anything */
+		background: #555;
+		-moz-border-radius: 25px;
+		-webkit-border-radius: 25px;
+		width: 600px;
+		border-radius: 25px;
+		padding: 10px;
+		position: relative;
+		top: 20px;
+		box-shadow: inset 0 -1px 1px rgba(255,255,255,0.3);
+		}
+		.meter > span {
+		transition: all 0.8s;
+		display: block;
+		height: 100%;
+		border-top-right-radius: 8px;
+		border-bottom-right-radius: 8px;
+		border-top-left-radius: 20px;
+		border-bottom-left-radius: 20px;
+		background-color: skyblue;
+		background-image: linear-gradient(
+		center bottom,
+		rgb(43,194,83) 37%,
+		rgb(84,240,84) 69%
+		);
+		box-shadow:
+		inset 0 2px 9px  rgba(255,255,255,0.3),
+		inset 0 -2px 6px rgba(0,0,0,0.4);
+		position: relative;
+		overflow: hidden;
+		}
+		@keyframes shake {
+		  0% { transform: translate(1px, 1px) rotate(0deg);}
+		  10% { transform: translate(-1px, -2px) rotate(-1deg);}
+		  20% { transform: translate(-3px, 0px) rotate(1deg);}
+		  30% { transform: translate(3px, 2px) rotate(0deg);}
+		  40% { transform: translate(1px, -1px) rotate(1deg);}
+		  50% { transform: translate(-1px, 9px) rotate(-1deg);}
+		  60% { transform: translate(-3px, 1px) rotate(0deg);}
+		  70% { transform: translate(3px, 1px) rotate(-1deg);}
+		  80% { transform: translate(-1px, -9px) rotate(1deg);}
+		  90% { transform: translate(1px, 2px) rotate(0deg);}
+		  100% { transform: translate(1px, -2px) rotate(-1deg);}
+		}
+		</style>
+	</head>
+	<body style="background-image: url(img/road.png);overflow:hidden;background-size: 1300px;background-position-y: 330px;" onkeydown="getKey()">
+		<div id="board" style="left: 880px;position: absolute;border: 2px #525252 solid;background-image: linear-gradient(45deg, #0c162f, #305479);border-bottom-left-radius: 20px;border-top-right-radius: 20px;width: 670px;height: 60px;box-shadow: inset 2px 1px 20px 0px black;padding: 20px;font-family: 'Bungee';color: white;">
+		</div>
+<h4 id="metmers" style="text-align: center;top: 100px;left: 616px;position: absolute;font-family: 'Bungee';font-size: 30px;color: white;display: none;"></h4>
+		<img src="img/ignition.png" id="ignition" style="
+		top: 20px;
+		left: 1510px;
+		position: absolute;
+		width: 70px;
+		">
+		<div style="display: inline-flex;
+			position: relative;
+			top: 20px;
+			left: 20px;">
+			<img src="img/head.png" style="
+			padding-right: 20px;
+			width: 50px;
+			">
+			<div class="meter" id="met">
+				<span style="width: 100%" id="mobilehealth"></span>
+			</div>
+		</div>
+		<img src="img/batmobile.png" id="batmobile" style="
+		width: 43px;
+		transition: all 1s;
+		position: absolute;
+		left: 640px;
+		top: 540px;
+		">
+		<img src="img/cars_forward.png" id="forward" style="
+		width: 43px;
+		position: absolute;
+		left: 710px;
+		top: -70px;
+		z-index: -190;
+		">
+		<img src="img/trashmaster.png" id="back" style="
+		width: 43px;
+		position: absolute;
+		left: 570px;
+		top: 760px;
+		z-index: -190;
+		">
+		<img src="img/truck.png" id="truck" style="
+		width: 43px;
+		position: absolute;
+		left: 520px;
+		top: 760px;
+		z-index: -190;
+		transition: all 2s;
+		">
+		<embed hidden="true" src="rock2.mp3"></embed>
+		<script type="text/javascript">
+		var forwardX = -70;
+		var backX = 760;
+		var screech = new Audio();
+		var scrollYvalue = 330;
+		var mobileX = 640;
+		var speed = 8;
+		var health = 100;
+		var rotation =0;
+		var ignited = "false";
+		var meters = 510;
+		var caught = "false";
+		var jokergone = "false";
+		screech.src = "squeal.wav";
+		function itsover5(){
+		document.getElementById('board').innerHTML = "THE END...."
+		window.close();
+		}
+		function itsover4(){
+		document.getElementById('board').innerHTML = "JOKER: 😥."
+		setTimeout("itsover5()", 2000);
+		}
+		function itsover3(){
+		document.getElementById('board').innerHTML = "BATMAN: I'm serious."
+		setTimeout("itsover4()", 2000);
+		}
+		function itsover2(){
+		document.getElementById('board').innerHTML = "JOKER: 😡🤬😡😡🤬."
+		setTimeout("itsover3()", 2000);
+		}
+		function itsover(){
+		document.getElementById('board').innerHTML = "BATMAN: It's over Joker. "
+		setTimeout("itsover2()", 2000);
+		}
+		function confused3(){
+		document.getElementById('board').innerHTML = "";
+		meters=5291;
+		runfar();
+		}
+		function confused2(){
+		document.getElementById('board').innerHTML = "BATMAN: Oh great. "
+		setTimeout("confused3()", 2000);
+		}
+		function boom(){
+		document.body.style.animation = "none";
+		setTimeout("confused2()", 2000);
+		}
+		function bang(){
+		document.body.style.animation = "shake 0.5s infinite";
+		setTimeout("boom()", 2000);
+		}
+		function confused(){
+		document.getElementById('board').innerHTML = "BATMAN: Hm? Why is he stopping?"
+		setTimeout("bang()", 2000);
+		}
+		function runfar(){
+		if (caught == "false") {
+		meters+=170;
+		setTimeout("runfar()", 200);
+		if (meters <= 0) {
+		caught="true";
+		speed = 0;
+		ignited = "false";
+		itsover();
+		}
+		document.getElementById('metmers').innerHTML=meters+" M"
+		}else{
+		document.getElementById('metmers').style.display = "none";
+		document.getElementById('truck').style.top = "540px";			
+		}
+		}
+		function joker7(){
+		document.getElementById('board').innerHTML = "";
+		document.getElementById('metmers').style.display = "";
+		jokergone = "true";
+		runfar();
+		}
+		function joker6(){
+		document.getElementById('board').innerHTML = "BATMAN: Just great.";		
+		setTimeout("joker7()", 2000);
+		}
+		function joker5(){
+		document.getElementById('board').innerHTML = "*Joker drives away*";
+		document.getElementById('truck').style.top = "-570px";
+		setTimeout("joker6()", 2000);
+		}
+		function joker4(){
+		document.getElementById('board').innerHTML = "BATMAN: You know what, I'm not amused 😒"
+		setTimeout("joker5()", 2000);
+		}
+		function joker3(){
+		document.getElementById('board').innerHTML = "BATMAN: Don't tell me - you're going to take over."
+		setTimeout("joker4()", 2000);
+		}
+		function joker2(){
+		document.getElementById('board').innerHTML = "JOKER: Come and get me. 💀"
+		setTimeout("joker3()", 2000);
+		}
+		function joker1(){
+		document.getElementById('board').innerHTML = "JOKER: Hello <i>Batman!!</i> *cackles*"
+		setTimeout("joker2()", 2000);
+		}
+		function event9(){
+		document.getElementById('truck').style.top = "540px"
+		setTimeout("joker1()", 2000);
+		}
+		function carsandmorecars8(){
+		document.getElementById('board').innerHTML = ""
+		setTimeout("event9()", 3000);
+		}
+		function carsandmorecars7(){
+		document.getElementById('board').innerHTML = "BATMAN:I'm on it."
+		setTimeout("carsandmorecars8()", 2000);
+		}
+		function carsandmorecars6(){
+		document.getElementById('board').innerHTML = "SUPERMAN: -iding a purple trailer truck!"
+		setTimeout("carsandmorecars7()", 2000);
+		}
+		function carsandmorecars5(){
+		document.getElementById('board').innerHTML = "SUPERMAN: The joker's attacking! He's r-"
+		setTimeout("carsandmorecars6()", 2000);
+		}
+		function carsandmorecars4(){
+		document.getElementById('board').innerHTML = "BATMAN:Huh? *picks up phone*"
+		setTimeout("carsandmorecars5()", 2000);
+		}
+		function carsandmorecars3(){
+		document.getElementById('board').innerHTML = "*telephone rings*"
+		setTimeout("carsandmorecars4()", 2000);
+		}
+		function carsandmorecars2(){
+		document.getElementById('board').innerHTML = "BATMAN:If there was a bit more action in the world. 😴"
+		setTimeout("carsandmorecars3()", 4000);
+		}
+		function carsandmorecars(){
+		document.getElementById('board').innerHTML = "BATMAN:Cars cars and more cars..."
+		setTimeout("carsandmorecars2()", 2000);
+		}
+		function scrollY(){
+		scrollYvalue += speed;
+		document.body.style.backgroundPositionY = scrollYvalue + "px";
+		setTimeout("scrollY()", 20);
+		}
+		function forwardmove(){
+		forwardX+=10;
+		document.getElementById('forward').style.top = forwardX + "px";
+		setTimeout("forwardmove()", 10);
+		}
+		function forwardtimer(){
+		forwardX = -70;
+			document.getElementById('forward').style.top = "-70px";
+		setTimeout("forwardtimer()", 6000);
+		}
+		function backmove(){
+		backX-=10;
+		document.getElementById('back').style.top = backX + "px";
+		setTimeout("backmove()", 10);
+		}
+		function backtimer(){
+		backX = 760;
+			document.getElementById('back').style.top = "760px";
+		setTimeout("backtimer()", 4000);
+		}
+		function getKey(){
+		var e = window.event;
+		if (e.key == "i") {
+		if (rotation == 90) {
+		if (ignited == "false") {
+		rotation=90;
+				ignited = "true";
+		scrollY();
+		}else{
+					console.log('dada');
+		}
+		}else{
+		rotation+=10
+		document.getElementById('ignition').style.transform='rotateZ('+rotation+'deg)';
+		}
+		}
+		if (ignition == "false") {
+		console.log('test');
+		}else{
+		if (e.key == "ArrowRight") {
+		if (ignited == "false") {
+		console.log('ummm');
+		}else{
+		if (mobileX == 740) {
+		document.getElementById('batmobile').style.transform='rotateZ(0deg)';
+		console.log('asdf. fdsa');
+		}else{
+		mobileX += 10;
+		document.getElementById('batmobile').style.transform='rotateZ(10deg)';
+		document.getElementById('batmobile').style.left=mobileX+"px";
+				}
+		}
+		}
+		if (e.key == "ArrowLeft") {
+		if (ignited == "false") {
+		console.log('ummm');
+		}else{
+		if (mobileX == 520) {
+		document.getElementById('batmobile').style.transform='rotateZ(0deg)';
+		console.log('asdf. fdsa');
+		}else{
+		mobileX -= 10;
+		document.getElementById('batmobile').style.transform='rotateZ(-10deg)';
+		document.getElementById('batmobile').style.left=mobileX+"px";
+					}
+		}
+		}
+		if (e.key == "ArrowUp") {
+		var forwardX = -70;
+		var backX = 760;
+		document.getElementById('batmobile').style.transform='rotateZ(0deg)';
+		speed+=2;
+		if (jokergone == "false") {
+		console.error('The Joker has not gone yet!');
+		}else{
+		meters-=speed;
+		}
+		}
+		if (e.key == "ArrowDown") {
+		document.getElementById('batmobile').style.transform='rotateZ(0deg)';
+		speed-=2;
+		}
+		if (e.key == " ") {
+		document.getElementById('batmobile').style.transform='rotateZ(0deg)';
+		if (speed>200) {
+		health -= 10;
+		document.getElementById('mobilehealth').style.width = health + "%";
+		}else{
+		console.log('asdfmovie12');
+		}
+		if (speed>0) {
+		screech.play();
+		}else{
+		console.log('bla');
+		}
+		speed=0;
+		}
+		}
+		if (health < 0) {
+		health = 0;
+		rotation = 0;
+		ignited="false";
+		alert('You failed the mission...');
+		window.open('index.html');
+		window.close();
+		}else{
+		console.error("mineturtle: hello!!");
+		}
+		}
+				setTimeout("backmove()", 6000);
+		setTimeout("forwardmove()", 4000);
+				setTimeout("backtimer()", 2000);
+		setTimeout("forwardtimer()", 2000);
+		setTimeout("carsandmorecars()", 7000);
+		</script>
+		<script type="text/javascript">document.getElementById('metmers').innerHTML=meters+" M"</script>
+	</body>
+</html>

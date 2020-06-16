@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Traffic Control</title>
+	<link href="https://fonts.googleapis.com/css2?family='Bungee'&display=swap" rel="stylesheet">
+</head>
+<body style="background-image: url('img/texture2.jpg');background-size: 1581px;text-align: center;padding: 100px;overflow: hidden;">
+<img src="img/traffic.png" id="traffic" style="
+    position: relative;
+    left: 1270px;
+    transition: all 0.2s;
+">
+<img src="img/control.png" id="control" style="
+    position: relative;
+    left: -1270px;
+    transition: all 0.2s;
+">
+<br>
+<br>
+<h1 id="slogan" style="font-size: 31px;color: white;text-shadow: 1px 1px 15px black;font-family: 'Bungee';position: relative;top: -570px;transition: all 0.4s;"><b>Helping the traffic with <i style="color: red;">speed.</i></b></h1>
+<br>
+<a href="game.html"><img src="img/play.png" id="play" style="width: 200px;position: relative;top: 180px;transition: all 0.8s;"></a>
+<embed hidden="true" src="rock2.mp3"></embed>
+<script type="text/javascript">
+function callplay(){
+	document.getElementById('play').style.top = "0px";
+}
+function callslogan(){
+	document.getElementById('slogan').style.top = "0px";
+	setTimeout("callplay()", 1000);
+}
+function callcontrol(){
+	document.getElementById('control').style.left = "0px";
+	setTimeout("callslogan()", 1000);
+}
+function calltraffic(){
+	document.getElementById('traffic').style.left = "0px";
+	setTimeout("callcontrol()", 500);
+}
+setTimeout("calltraffic()", 500);
+</script>
+</body>
+</html>
